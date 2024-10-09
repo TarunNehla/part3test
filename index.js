@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express')
 const app = express()
 const cors = require('cors')
+app.use(express.static('dist'))
 app.use(cors())
 app.use(express.json())
 
@@ -43,6 +44,8 @@ app.get('/api/notes/:id', (request,response) =>{
 
 })
 
+
+
 app.delete('/api/notes/:id', (request,response) => {
   const id = request.params.id
   notes = notes.filter(n => n.id!==id)
@@ -54,9 +57,14 @@ app.post('/api/notes', (request,response) => {
   
   const body = request.body
   if(!body.content){
-    return response
+    return response.status(400).json({ error: 'Content missing' });
   }
-  note.id = String(maxId+1)
+
+  const note = {
+    id : String(maxId+1),
+    content : body.content,
+    important : body.important || false,
+  }
   notes = notes.concat(note)
   response.json(note)
 })
